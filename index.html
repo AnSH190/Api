@@ -14,9 +14,20 @@
     <div id="songResults"></div>
 
     <script>
+<<<<<<< HEAD
       const searchForm = document.getElementById("searchForm");
       const songNameInput = document.getElementById("songName");
       const songResults = document.getElementById("songResults");
+=======
+              const url = 'https://deezerdevs-deezer.p.rapidapi.com/infos';
+      const options = {
+      	method: 'GET',
+      	headers: {
+      		'X-RapidAPI-Key': // get it from website,
+      		'X-RapidAPI-Host': // get it from website
+      	}
+      };
+>>>>>>> c8e54ad11a85591647ea9ede24d44f96d43f2fa2
 
       searchForm.addEventListener("submit", async function (e) {
         e.preventDefault();

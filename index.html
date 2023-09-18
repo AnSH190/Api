@@ -1,33 +1,85 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>APIS</title>
+    <title>Deezer API Example</title>
   </head>
   <body>
-    <form action="#">
-      <input type="text" class="city" />
-      <button type="submit">search</button>
+    <form id="searchForm">
+      <input type="text" id="songName" placeholder="Enter a song name" />
+      <button type="submit">Search</button>
     </form>
-    <h1></h1>
+    <div id="songResults"></div>
 
     <script>
-              const url = 'https://deezerdevs-deezer.p.rapidapi.com/infos';
-      const options = {
-      	method: 'GET',
-      	headers: {
-      		'X-RapidAPI-Key': 'eb710828a4msha295e99c039484cp1d0831jsn27ecaf0d4f0d',
-      		'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com'
-      	}
-      };
+      const searchForm = document.getElementById("searchForm");
+      const songNameInput = document.getElementById("songName");
+      const songResults = document.getElementById("songResults");
 
-      try {
-      	const response = await fetch(url, options);
-      	const result = await response.text();
-      	console.log(result);
-      } catch (error) {
-      	console.error(error);
+      searchForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const songName = songNameInput.value.trim();
+
+        if (songName === "") {
+          return;
+        }
+
+        const url = `https://deezerdevs-deezer.p.rapidapi.com/search?q=${encodeURIComponent(
+          songName
+        )}`;
+        const options = {
+          method: "GET",
+          headers: {
+            "X-RapidAPI-Key":
+              "eb710828a4msha295e99c039484cp1d0831jsn27ecaf0d4f0d",
+            "X-RapidAPI-Host": "deezerdevs-deezer.p.rapidapi.com",
+          },
+        };
+
+        try {
+          const response = await fetch(url, options);
+          const result = await response.json();
+          displayTopResult(result.data);
+        } catch (error) {
+          console.error(error);
+          songResults.innerHTML = "An error occurred. Please try again later.";
+        }
+      });
+
+      function displayTopResult(tracks) {
+        songResults.innerHTML = "";
+
+        if (tracks.length === 0) {
+          songResults.innerHTML = "No results found.";
+          return;
+        }
+
+        // Find the track with the most listens (you can use a different criterion if needed)
+        const topTrack = tracks.reduce((max, track) => {
+          return track.played_total > max.played_total ? track : max;
+        });
+
+        // Print all available information about the top track in the console
+        console.log("Top Track Information:", topTrack);
+
+        const trackName = topTrack.title;
+        const artistName = topTrack.artist.name;
+        const trackPreview = topTrack.preview;
+
+        const player = document.createElement("div");
+        player.innerHTML = `
+            <h2>${trackName}</h2>
+            <p>Artist: ${artistName}</p>
+            <audio controls>
+                <source src="${trackPreview}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        `;
+
+        songResults.appendChild(player);
       }
     </script>
   </body>
